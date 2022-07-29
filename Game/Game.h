@@ -6,6 +6,7 @@
 #include <Renderer/InputLayout.h>
 #include <EngineShader/STLDefaultShader.h>
 #include <EngineShader/STLPositionColorShader.h>
+#include <EngineShader/STLPositionColorUVShader.h>
 #include <Renderer/IndexBuffer.h>
 
 namespace STL
@@ -28,6 +29,10 @@ namespace STL
 		VertexBuffer vertexBuffer;
 		IndexBuffer indexBuffer;
 		InputLayout inputLayout;
-		STLPositionColorShader mainShader;
+		STLPositionColorUVShader mainShader;	// 사용하고싶은 셰이더로 변경해야한다.
+
+		// 텍스쳐 매핑 관련
+		ID3D11ShaderResourceView* texture;
+		ID3D11SamplerState* samplerState;
 	};
 }
