@@ -6,7 +6,7 @@
 namespace STL
 {
 	Game::Game(HINSTANCE hInstance, uint32 width, uint32 height, const std::wstring& title)
-		: Application(hInstance, width, height, title), texture(nullptr), samplerState(nullptr)
+		: Application(hInstance, width, height, title)
 	{
 	}
 
@@ -89,21 +89,26 @@ namespace STL
 		inputLayout.Create(device, layout, _countof(layout), mainShader.GetVertexShaderBuffer());
 
 		// 텍스처 로딩
-		texture = TextureLoader::CreateShaderResourceView(device, L"sample.jpg");
-		if (texture == nullptr)
-		{
-			throw std::exception("failed to load texture");
-		}
+		texture = Texture(L"sample.jpg");
+		texture.Create(device);
 
-		// 샘플러 스테이트 생성
-		D3D11_SAMPLER_DESC samplerDesc = {};
-		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+		texture1 = Texture(L"jammin.jpg");
+		texture1.Create(device);
 
-		auto result = device->CreateSamplerState(&samplerDesc, &samplerState);
-		ThrowIfFailed(result, "failed to create sampler state");
+		texture2 = Texture(L"jammin2.jpg");
+		texture2.Create(device);
+
+		samplerState.Create(device);
+
+		//// 샘플러 스테이트 생성
+		//D3D11_SAMPLER_DESC samplerDesc = {};
+		//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		//samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+		//samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+		//samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+
+		//auto result = device->CreateSamplerState(&samplerDesc, &samplerState);
+		//ThrowIfFailed(result, "failed to create sampler state");
 	}
 	
 	void Game::RenderScene()
@@ -118,8 +123,15 @@ namespace STL
 
 		indexBuffer.Bind(context);
 
-		context->PSSetShaderResources(0, 1, &texture);
-		context->PSSetSamplers(0, 1, &samplerState);
+		texture.Bind(context, 0);
+		texture1.Bind(context, 1);
+		texture2.Bind(context, 2);
+
+		samplerState.Bind(context, 0);
+
+		//context->PSSetShaderResources(0, 1, &texture);
+		//context->PSSetShaderResources(1, 1, &texture1);
+		//context->PSSetSamplers(0, 1, &samplerState);
 
 		// 드로우 콜 (Draw Call).
 		//context->Draw(vertexBuffer.Count(), 0);
