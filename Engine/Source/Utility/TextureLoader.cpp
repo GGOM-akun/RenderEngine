@@ -25,7 +25,7 @@ namespace STL
 
 		DirectX::ScratchImage image;
 		HRESULT hr = E_FAIL;
-		if (extension == TEXT("tga"))
+		if (extension == TEXT("tga") || extension == TEXT("targa"))
 		{
 			hr = DirectX::LoadFromTGAFile(
 				finalPath.c_str(),
