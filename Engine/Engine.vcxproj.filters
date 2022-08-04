@@ -90,6 +90,21 @@
     <ClInclude Include="Source\Renderer\SamplerState.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Math\MathHelper.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\Matrix4f.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Math\Quaternionf.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\ConstantBuffer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EngineShader\STLTransformShader.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\Core.cpp">
@@ -164,6 +179,21 @@
     <ClCompile Include="Source\Renderer\SamplerState.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Math\MathHelper.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Math\Matrix4f.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Math\Quaternionf.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\ConstantBuffer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EngineShader\STLTransformShader.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\VertexShader.hlsl" />
@@ -172,5 +202,7 @@
     <FxCompile Include="Shader\PositionColorPixelShader.hlsl" />
     <FxCompile Include="Shader\PositionColorUVVertexShader.hlsl" />
     <FxCompile Include="Shader\PositionColorUVPixelShader.hlsl" />
+    <FxCompile Include="Shader\TransformVertexShader.hlsl" />
+    <FxCompile Include="Shader\TransformPixelShader.hlsl" />
   </ItemGroup>
 </Project>

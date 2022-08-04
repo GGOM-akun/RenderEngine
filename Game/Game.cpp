@@ -2,6 +2,7 @@
 #include <Renderer/VertexDeclaration.h>
 #include <Utility/TextureLoader.h>
 #include <Utility/STLException.h>
+#include <Math/MathHelper.h>
 
 namespace STL
 {
@@ -24,6 +25,7 @@ namespace STL
 		auto device = deviceManager->GetDevice();
 
 		// 정점 버퍼 생성.
+
 		//VertexPosition vertices[] =
 		//{
 		//	//VertexPosition( 0.0f, 0.5f, 0.5f),
@@ -100,6 +102,16 @@ namespace STL
 
 		samplerState.Create(device);
 
+		// 위치 행렬만 적용해서 월드 행렬 생성
+		worldMatrix = Matrix4f::Translation(position);
+		// 월드 행렬을 데이터로 상수 버퍼 생성
+		transformBuffer = ConstantBuffer(&worldMatrix, 1, sizeof(worldMatrix));
+		transformBuffer.Create(device);
+
+		//rotation.z = 180.0f;
+		//scale.x = 0.5f;
+		//position.y = 0.5f;
+
 		//// 샘플러 스테이트 생성
 		//D3D11_SAMPLER_DESC samplerDesc = {};
 		//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -109,6 +121,41 @@ namespace STL
 
 		//auto result = device->CreateSamplerState(&samplerDesc, &samplerState);
 		//ThrowIfFailed(result, "failed to create sampler state");
+	}
+
+	void Game::Update(float deltaTime)
+	{
+		static float alpha = 0.0f;
+		static float sign = 1.0f;
+		alpha += 0.5f * deltaTime * sign;
+		if (deltaTime > 1.0f)
+		{
+			alpha = 0.0f;
+		}
+
+		if (alpha > 1.0f)
+		{
+			sign = -1.0f;
+		}
+
+		if (alpha < 0.0f)
+		{
+			sign = 1.0f;
+		}
+
+		static float xStart = -0.5f;
+		static float xEnd = 0.5f;
+
+		float xPosition = MathHelper::Lerpf(xStart, xEnd, alpha);
+		position.x = xPosition;
+
+		// 위치/회전/스케일 값을 적용해서 월드 행렬 데이터 업데이트
+		worldMatrix = Matrix4f::Scale(scale)
+			* Matrix4f::Rotation(rotation)
+			* Matrix4f::Translation(position);
+
+		// 갱신된 월드 행렬 데이터로 상수 버퍼 업데이트
+		transformBuffer.Update(deviceManager->GetContext(), &worldMatrix);
 	}
 	
 	void Game::RenderScene()
@@ -128,6 +175,8 @@ namespace STL
 		texture2.Bind(context, 2);
 
 		samplerState.Bind(context, 0);
+
+		transformBuffer.Bind(context, 0);
 
 		//context->PSSetShaderResources(0, 1, &texture);
 		//context->PSSetShaderResources(1, 1, &texture1);

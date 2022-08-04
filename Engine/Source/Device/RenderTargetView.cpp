@@ -1,3 +1,4 @@
+#include "Core.h"
 #include "RenderTargetView.h"
 #include <Utility/STLException.h>
 #include <cassert>		// assert 함수 사용하기 위해 포함.

@@ -1,3 +1,4 @@
+#include "Core.h"
 #include "DeviceManager.h"
 #include <Utility/STLException.h>
 
@@ -103,4 +104,39 @@ namespace STL
         //swapChain->Present(syncInterval, flags);
         swapChain.Present(syncInterval, flags);
 	}
+    
+    void DeviceManager::OnResize(uint32 width, uint32 height)
+    {
+        //assert(device != nullptr);
+        assert(device);
+        assert(context);
+        assert(swapChain.Get());
+
+        // 렌더타겟 해제
+        SafeRelease(renderTargetView.Get());
+
+        // 스왑체인의 버퍼 크기 조정
+        auto result = swapChain.Get()->ResizeBuffers(
+            1, width, height,
+            DXGI_FORMAT_R8G8B8A8_UNORM,
+            0
+        );
+
+        // 오류 확인
+        ThrowIfFailed(result, "Failed to resize swap chain");
+
+        // 렌더타겟 재생성
+        renderTargetView.Create(swapChain.Get(), device);
+
+        // 뷰포트(화면) 생성
+        D3D11_VIEWPORT viewport = { };
+        viewport.TopLeftX = 0.0f;
+        viewport.TopLeftY = 0.0f;
+        viewport.Width = static_cast<float>(width);
+        viewport.Height = static_cast<float>(height);
+        viewport.MinDepth = 0.0f;
+        viewport.MaxDepth = 1.0f;
+
+        context->RSSetViewports(1, &viewport);
+    }
 }

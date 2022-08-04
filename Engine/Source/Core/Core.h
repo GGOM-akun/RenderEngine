@@ -7,7 +7,9 @@
 
 // 미봉책.
 // C4251 컴파일 오류 비활성화.
+// C4244 컴파일 오류 비활성화.
 #pragma warning(disable: 4251)
+#pragma warning(disable: 4244)
 
 #ifdef ENGINE_BUILD_DLL
 #define ENGINE_API __declspec(dllexport)
@@ -28,6 +30,8 @@
 #include <algorithm>
 #include <sstream>				// 문자열 조합에 편리함. String.Format().
 #include <filesystem>
+
+#include <cassert>				// assert 함수 사용을 위함. 특정 조건을 만족하지 않으면 중단.
 
 // 타입 재정의.
 using uint32 = unsigned int;

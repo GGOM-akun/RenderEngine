@@ -1,3 +1,4 @@
+#include "Core.h"
 #include "InputLayout.h"
 #include <Utility/STLException.h>
 
