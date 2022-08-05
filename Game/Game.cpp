@@ -3,6 +3,7 @@
 #include <Utility/TextureLoader.h>
 #include <Utility/STLException.h>
 #include <Math/MathHelper.h>
+#include <cmath>
 
 namespace STL
 {
@@ -142,10 +143,10 @@ namespace STL
 	{
 		static float alpha = 0.0f;
 		static float sign = 1.0f;
-		static float moveSpeed = 0.5f;
-		static float actorOffset = actor1->Position().x;
+		static float moveSpeed = 0.5;
+		static float actorOffset = actor1->Position().y;
 		static float actorOffset2 = actor2->Position().x;
-		alpha += moveSpeed * deltaTime * sign;
+		alpha += moveSpeed * deltaTime * sign * sin(gameTimer->TotalTime());	// sin(gameTimer->TotalTime()를 곱해주면 속도가 변함.
 		if (deltaTime > 1.0f)
 		{
 			alpha = 0.0f;
@@ -161,11 +162,18 @@ namespace STL
 			sign = 1.0f;
 		}
 
+		static float yStart = -0.25f;
+		static float yEnd = -0.75f;
+
 		static float xStart = -0.25f;
 		static float xEnd = 0.25f;
 
+		float yPosition = MathHelper::Lerpf(yStart, yEnd, alpha);
+		actor1->SetPosition(yPosition + actorOffset, 0.0f, 0.0f);
+		//actor2->SetPosition(xPosition + actorOffset2, 0.0f, 0.0f);
+
 		float xPosition = MathHelper::Lerpf(xStart, xEnd, alpha);
-		actor1->SetPosition(xPosition + actorOffset, 0.0f, 0.0f);
+		//actor1->SetPosition(xPosition + actorOffset, 0.0f, 0.0f);
 		actor2->SetPosition(xPosition + actorOffset2, 0.0f, 0.0f);
 
 		auto context = deviceManager->GetContext();
