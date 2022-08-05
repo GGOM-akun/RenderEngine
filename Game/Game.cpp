@@ -102,11 +102,26 @@ namespace STL
 
 		samplerState.Create(device);
 
-		// 위치 행렬만 적용해서 월드 행렬 생성
-		worldMatrix = Matrix4f::Translation(position);
-		// 월드 행렬을 데이터로 상수 버퍼 생성
-		transformBuffer = ConstantBuffer(&worldMatrix, 1, sizeof(worldMatrix));
-		transformBuffer.Create(device);
+		// 물체 생성
+		actor1 = std::make_unique<Actor>(device);
+		actor1->Create(device);
+		// X,Y 스케일을 1/2로 축소
+		actor1->SetScale(0.5f, 0.5f, 1.0f);
+		// 물체 위치를 왼쪽으로 0.5만큼 이동
+		actor1->SetPosition(-0.5f, 0.0f, 0.5f);
+
+		actor2 = std::make_unique<Actor>(device);
+		actor2->Create(device);
+		// X, Y 스케일을 1/2로 축소
+		actor2->SetScale(0.5f, 0.5f, 1.0f);
+		// 물체 위치를 오른쪽으로 0.5만큼 이동
+		actor2->SetPosition(0.5f, 0.0f, 0.5f);
+
+		//// 위치 행렬만 적용해서 월드 행렬 생성
+		//worldMatrix = Matrix4f::Translation(position);
+		//// 월드 행렬을 데이터로 상수 버퍼 생성
+		//transformBuffer = ConstantBuffer(&worldMatrix, 1, sizeof(worldMatrix));
+		//transformBuffer.Create(device);
 
 		//rotation.z = 180.0f;
 		//scale.x = 0.5f;
@@ -127,7 +142,10 @@ namespace STL
 	{
 		static float alpha = 0.0f;
 		static float sign = 1.0f;
-		alpha += 0.5f * deltaTime * sign;
+		static float moveSpeed = 0.5f;
+		static float actorOffset = actor1->Position().x;
+		static float actorOffset2 = actor2->Position().x;
+		alpha += moveSpeed * deltaTime * sign;
 		if (deltaTime > 1.0f)
 		{
 			alpha = 0.0f;
@@ -143,19 +161,16 @@ namespace STL
 			sign = 1.0f;
 		}
 
-		static float xStart = -0.5f;
-		static float xEnd = 0.5f;
+		static float xStart = -0.25f;
+		static float xEnd = 0.25f;
 
 		float xPosition = MathHelper::Lerpf(xStart, xEnd, alpha);
-		position.x = xPosition;
+		actor1->SetPosition(xPosition + actorOffset, 0.0f, 0.0f);
+		actor2->SetPosition(xPosition + actorOffset2, 0.0f, 0.0f);
 
-		// 위치/회전/스케일 값을 적용해서 월드 행렬 데이터 업데이트
-		worldMatrix = Matrix4f::Scale(scale)
-			* Matrix4f::Rotation(rotation)
-			* Matrix4f::Translation(position);
-
-		// 갱신된 월드 행렬 데이터로 상수 버퍼 업데이트
-		transformBuffer.Update(deviceManager->GetContext(), &worldMatrix);
+		auto context = deviceManager->GetContext();
+		actor1->Update(context, deltaTime);
+		actor2->Update(context, deltaTime);
 	}
 	
 	void Game::RenderScene()
@@ -176,7 +191,7 @@ namespace STL
 
 		samplerState.Bind(context, 0);
 
-		transformBuffer.Bind(context, 0);
+		actor1->Bind(context);
 
 		//context->PSSetShaderResources(0, 1, &texture);
 		//context->PSSetShaderResources(1, 1, &texture1);
@@ -184,6 +199,10 @@ namespace STL
 
 		// 드로우 콜 (Draw Call).
 		//context->Draw(vertexBuffer.Count(), 0);
+		context->DrawIndexed(indexBuffer.Count(), 0u, 0u);
+
+		actor2->Bind(context);
+
 		context->DrawIndexed(indexBuffer.Count(), 0u, 0u);
 	}
 }
