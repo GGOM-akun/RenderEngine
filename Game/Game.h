@@ -21,6 +21,8 @@
 #include <Component/Actor.h>
 #include <Component/TransformComponent.h>
 
+#include "DemoLevel.h"
+
 namespace STL
 {
 	class Game : public Application
@@ -39,8 +41,8 @@ namespace STL
 		virtual void RenderScene() override;
 
 	private:
-		VertexBuffer vertexBuffer;
-		IndexBuffer indexBuffer;
+		//VertexBuffer vertexBuffer;
+		//IndexBuffer indexBuffer;
 		InputLayout inputLayout;
 		STLTransformShader mainShader;	// 사용하고싶은 셰이더로 변경해야한다.
 
@@ -49,6 +51,8 @@ namespace STL
 		Texture texture1;
 		Texture texture2;
 		SamplerState samplerState;
+
+		DemoLevel mainLevel;
 
 		//// 위치/회전/스케일
 		//// 행렬 TRS.
@@ -61,7 +65,7 @@ namespace STL
 		//ConstantBuffer transformBuffer;
 
 		// Actor.
-		std::unique_ptr<Actor> actor1;
-		std::unique_ptr<Actor> actor2;
+		//std::unique_ptr<Actor> actor1;
+		//std::unique_ptr<Actor> actor2;
 	};
 }
