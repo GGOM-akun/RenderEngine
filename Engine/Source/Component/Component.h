@@ -7,6 +7,7 @@ namespace STL
 {
 	// 穿号識情
 	class Actor;
+	class TransformComponent;
 	class ENGINE_API Component : public RTTI
 	{
 		// RTTI 識情
@@ -25,5 +26,6 @@ namespace STL
 
 	protected:
 		Actor* ownerActor;
+		TransformComponent* transform;
 	};
 }

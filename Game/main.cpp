@@ -1,7 +1,6 @@
 #include <Core/Core.h>
 #include "Game.h"
 
-
 using STL::Game;
 
 int WINAPI WinMain(

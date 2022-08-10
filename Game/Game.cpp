@@ -5,6 +5,8 @@
 #include <Math/MathHelper.h>
 #include <cmath>
 
+#include <Device/KeyboardInput.h>
+
 namespace STL
 {
 	Game::Game(HINSTANCE hInstance, uint32 width, uint32 height, const std::wstring& title)
@@ -139,7 +141,7 @@ namespace STL
 		//ThrowIfFailed(result, "failed to create sampler state");
 
 		// 레벨 초기화
-		mainLevel.Initialize(device);
+		mainLevel.Initialize(device, this);
 	}
 
 	void Game::Update(float deltaTime)
@@ -223,5 +225,20 @@ namespace STL
 		//actor2->Bind(context);
 		//
 		//context->DrawIndexed(indexBuffer.Count(), 0u, 0u);
+	}
+
+	void Game::ProcessInput()
+	{
+		Application::ProcessInput();
+
+		// ESC 키 종료 처리
+		if (keyboard->IsKeyDown(Keys::Escape))
+		{
+			if (MessageBox(nullptr, L"종료 하시겠습니까?", L"종료", MB_YESNO)
+				== IDYES)
+			{
+				DestroyWindow(mainWindow->Handle());
+			}
+		}
 	}
 }

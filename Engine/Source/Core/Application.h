@@ -7,6 +7,9 @@
 
 namespace STL
 {
+	// 전방선언
+	class KeyboardInput;
+	class MouseInput;
 	class ENGINE_API Application
 	{
 	public:
@@ -26,12 +29,18 @@ namespace STL
 		virtual void Update(float deltaTime = 0.0f);
 		virtual void Draw();
 
+		uint32 Width() { return mainWindow->Width(); }
+		uint32 Height() { return mainWindow->Height(); }
+
 		virtual LRESULT MessageProcessor(
 			HWND handle,
 			uint32 message,
 			WPARAM wParam,
 			LPARAM lParam
 		);
+
+		KeyboardInput* GetKeyboard();
+		MouseInput* GetMouse();
 
 	protected:
 
@@ -43,6 +52,9 @@ namespace STL
 
 		std::unique_ptr<Window> mainWindow;
 		std::unique_ptr<DeviceManager> deviceManager;
+
+		std::unique_ptr<KeyboardInput> keyboard;
+		std::unique_ptr<MouseInput> mouse;
 
 		std::unique_ptr<GameTimer> gameTimer;
 		uint32 targetFrameRate = 120;
