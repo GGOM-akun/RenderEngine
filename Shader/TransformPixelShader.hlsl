@@ -19,7 +19,8 @@ float4 main(PSInput input) : SV_TARGET
     float4 mapColor2 = map2.Sample(mapSampler, input.texCoord);
 
 	// 색상 혼합(사칙연산 가능)
-    float3 finalColor = (mapColor.rgb * 0.01) + (mapColor1.rgb * 0.01) +
-    (mapColor2.rgb * 1) + (input.color * 0.05);
-    return float4(finalColor, 1);
+    //float3 finalColor = (mapColor.rgb * 0.01) + (mapColor1.rgb * 0.01) +
+    //(mapColor2.rgb * 1) + (input.color * 0.05);
+    //return float4(finalColor, 1);
+    return mapColor;
 }

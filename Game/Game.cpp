@@ -74,7 +74,7 @@ namespace STL
 		//indexBuffer.Create(device);
 
 		// 쉐이더 초기화.
-		mainShader.Initialize(device);
+		//mainShader.Initialize(device);
 
 		// 입력 레이아웃 생성.
 		//LPCSTR SemanticName;
@@ -84,26 +84,26 @@ namespace STL
 		//UINT AlignedByteOffset;
 		//D3D11_INPUT_CLASSIFICATION InputSlotClass;
 		//UINT InstanceDataStepRate;
-		D3D11_INPUT_ELEMENT_DESC layout[] =
+		/*D3D11_INPUT_ELEMENT_DESC layout[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-		};
+		};*/
 
-		inputLayout.Create(device, layout, _countof(layout), mainShader.GetVertexShaderBuffer());
+		//inputLayout.Create(device, layout, _countof(layout), mainShader.GetVertexShaderBuffer());
 
 		// 텍스처 로딩
-		texture = Texture(L"sample.jpg");
-		texture.Create(device);
-
-		texture1 = Texture(L"jammin.jpg");
-		texture1.Create(device);
-
-		texture2 = Texture(L"jammin2.jpg");
-		texture2.Create(device);
-
-		samplerState.Create(device);
+		//texture = Texture(L"sample.jpg");
+		//texture.Create(device);
+		//
+		//texture1 = Texture(L"jammin.jpg");
+		//texture1.Create(device);
+		//
+		//texture2 = Texture(L"jammin2.jpg");
+		//texture2.Create(device);
+		//
+		//samplerState.Create(device);
 
 		//// 물체 생성
 		//actor1 = std::make_unique<Actor>(device);
@@ -197,17 +197,17 @@ namespace STL
 
 		// Draw 함수를 실행하기 전에 GPU에서 사용할 리소스를 모두 바인딩(연결)한다.
 		// 순서는 상관 없음.
-		inputLayout.Bind(context);
+		//inputLayout.Bind(context);
 		//vertexBuffer.Bind(context);
-		mainShader.Bind(context);
-
+		//mainShader.Bind(context);
+		//
 		//indexBuffer.Bind(context);
-
-		texture.Bind(context, 0);
-		texture1.Bind(context, 1);
-		texture2.Bind(context, 2);
-
-		samplerState.Bind(context, 0);
+		//
+		//texture.Bind(context, 0);
+		//texture1.Bind(context, 1);
+		//texture2.Bind(context, 2);
+		//
+		//samplerState.Bind(context, 0);
 
 		mainLevel.Bind(context);
 		mainLevel.Draw(context);

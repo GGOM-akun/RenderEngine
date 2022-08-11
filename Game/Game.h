@@ -45,14 +45,14 @@ namespace STL
 	private:
 		//VertexBuffer vertexBuffer;
 		//IndexBuffer indexBuffer;
-		InputLayout inputLayout;
-		STLTransformShader mainShader;	// 사용하고싶은 셰이더로 변경해야한다.
+		//InputLayout inputLayout;
+		//STLTransformShader mainShader;	// 사용하고싶은 셰이더로 변경해야한다.
 
-		// 텍스쳐 매핑 관련
-		Texture texture;
-		Texture texture1;
-		Texture texture2;
-		SamplerState samplerState;
+		//// 텍스쳐 매핑 관련
+		//Texture texture;
+		//Texture texture1;
+		//Texture texture2;
+		//SamplerState samplerState;
 
 		DemoLevel mainLevel;
 
