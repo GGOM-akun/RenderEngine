@@ -15,10 +15,13 @@
 
 #include <Material/Material.h>
 #include <Material/TransformMaterial.h>
+#include <Material/DiffuseMaterial.h>
+
 #include <Utility/ModelLoader.h>
 
 #include "SoldierActor.h"
 #include "SquidGameActor.h"
+#include <Component/LightComponent.h>
 
 namespace STL
 {
@@ -33,23 +36,23 @@ namespace STL
 
 	void DemoLevel::Initialize(ID3D11Device* device, Application* engine)
 	{
-		VertexPositionColorUV vertices[] =
+		VertexPositionColorUVNormal vertices[] =
 		{
-			VertexPositionColorUV({ -0.5f, -0.5f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f }),		// 왼쪽 하단.
-			VertexPositionColorUV({ -0.5f,  0.5f, 0.5f}, {0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f }),		// 왼쪽 상단.
-			VertexPositionColorUV({ 0.5f,  0.5f, 0.5f}, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f }),		// 오른쪽 상단.
-			VertexPositionColorUV({ 0.5f, -0.5f, 0.5f}, { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }),		// 오른쪽 하단.
+			VertexPositionColorUVNormal({ -0.5f, -0.5f, 0.5f}, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f }, {0.0f, 0.0f, - 1.0f}),		// 왼쪽 하단.
+			VertexPositionColorUVNormal({ -0.5f,  0.5f, 0.5f}, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f }, {0.0f, 0.0f, - 1.0f}),		// 왼쪽 상단.
+			VertexPositionColorUVNormal({  0.5f,  0.5f, 0.5f}, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f }, {0.0f, 0.0f, - 1.0f}),		// 오른쪽 상단.
+			VertexPositionColorUVNormal({  0.5f, -0.5f, 0.5f}, { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, {0.0f, 0.0f, - 1.0f}),		// 오른쪽 하단.
 		};
-
+		
 		uint32 indices[] = { 0, 1, 3, 1, 2, 3 };
-
+		
 		// 머티리얼 생성.
 		TransformMaterial* transformMaterial = new TransformMaterial();
 		transformMaterial->AddTexture(new Texture(L"sample.jpg"));
 		transformMaterial->AddTexture(new Texture(L"directx.png"));
 		transformMaterial->AddTexture(new Texture(L"circle.jpg"));
 		materials.emplace_back(transformMaterial);
-
+		
 		// Actor1 구성.
 		Actor* actor = new Actor(device);
 		actor->SetPosition(-0.5f, 0.0f, 0.0f);
@@ -60,12 +63,12 @@ namespace STL
 			indices, _countof(indices), sizeof(uint32));
 		meshComponent->AddMaterial(transformMaterial);
 		actor->AddComponent(meshComponent);
-
+		
 		// Actor2 구성.
 		Actor* actor2 = new Actor(device);
 		actor2->SetPosition(0.5f, 0.0f, 0.0f);
 		actor2->SetScale(0.5f, 0.5f, 1.0f);
-
+		
 		auto meshComponent2 = new StaticMeshComponent();
 		meshComponent2->Create(device, vertices, _countof(vertices), sizeof(vertices[0]),
 			indices, _countof(indices), sizeof(uint32));
@@ -96,12 +99,12 @@ namespace STL
 		ModelLoader::LoadModel(device, "Soldier.fbx", soldierMesh);
 
 		// 머티리얼 생성.
-		TransformMaterial* soldierBodyMaterial = new TransformMaterial();
+		auto soldierBodyMaterial = new DiffuseMaterial();
 		soldierBodyMaterial->AddTexture(new Texture(L"Soldier_Body_diffuse.png"));
 		soldierBodyMaterial->Initialize(device);
 		materials.emplace_back(soldierBodyMaterial);
 
-		TransformMaterial* soldierHeadMaterial = new TransformMaterial();
+		auto soldierHeadMaterial = new DiffuseMaterial();
 		soldierHeadMaterial->AddTexture(new Texture(L"Soldier_head_diffuse.png"));
 		soldierHeadMaterial->Initialize(device);
 		materials.emplace_back(soldierHeadMaterial);
@@ -129,19 +132,24 @@ namespace STL
 		ModelLoader::LoadModel(device, "PinkSoldier_v01.fbx", squidGameMesh);
 
 		// 머티리얼 생성.
-		auto squidGameMat1 = new TransformMaterial();
-		squidGameMat1->AddTexture(new Texture(L"PinkSoldier_BaseColor_1011.png"));
+		auto squidGameMat1 = new DiffuseMaterial();
+		squidGameMat1->AddTexture(new Texture(L"PinkSoldier_BaseColor_1001.png"));
 		materials.emplace_back(squidGameMat1);
-
-		auto squidGameMat2 = new TransformMaterial();
+		
+		auto squidGameMat2 = new DiffuseMaterial();
 		squidGameMat2->AddTexture(new Texture(L"PinkSoldier_BaseColor_1002.png"));
 		materials.emplace_back(squidGameMat2);
 
 		// 액터 생성 및 설정.
 		SquidGameActor* squidGameActor = new SquidGameActor(device);
-		squidGameActor->SetPosition(150.0f, 0.0f, 0.0f);
+		squidGameActor->SetPosition(125.0f, 0.0f, 0.0f);
 		squidGameActor->SetStaticMesh(squidGameMesh);
 		squidGameActor->SetMaterials(squidGameMat1, squidGameMat2);
+
+		// 라이트 액터 생성
+		Actor* lightActor = new Actor(device);
+		lightActor->SetPosition(500.0f, 500.0f, -500.0f);
+		lightActor->AddComponent(new LightComponent());
 
 		// 레벨에 액터 추가.
 		AddActor(actor);
@@ -149,6 +157,7 @@ namespace STL
 		AddActor(cameraActor);
 		AddActor(soldierActor);
 		AddActor(squidGameActor);
+		AddActor(lightActor);
 
 		Level::Initialize(device, engine);
 	}

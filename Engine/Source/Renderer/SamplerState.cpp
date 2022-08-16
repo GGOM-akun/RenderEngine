@@ -19,7 +19,7 @@ namespace STL
 		// 샘플러 스테이트 생성.
 		D3D11_SAMPLER_DESC samplerDesc = {};
 		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;		// WRAP는 반복(랩, 감싸다)모드
 		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 

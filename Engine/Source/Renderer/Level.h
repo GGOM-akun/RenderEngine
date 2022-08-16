@@ -20,7 +20,7 @@ namespace STL
 
 	protected:
 		std::vector<Actor*> actors;
-
 		Actor* mainCamera;
+		Actor* mainLight;
 	};
 }

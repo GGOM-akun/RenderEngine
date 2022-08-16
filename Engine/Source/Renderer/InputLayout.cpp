@@ -27,7 +27,7 @@ namespace STL
 
 		ThrowIfFailed(result, "Failed to create Input Layout.");
 	}
-
+	
 	void InputLayout::Create(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
 	{
 		ID3D11ShaderReflection* vertexShaderReflection;
