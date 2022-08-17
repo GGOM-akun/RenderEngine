@@ -16,6 +16,11 @@
 #include <Material/Material.h>
 #include <Material/TransformMaterial.h>
 #include <Material/DiffuseMaterial.h>
+#include <Material/DiffuseSpecularMaterial.h>
+#include <Material/NormalMappingMaterial.h>
+#include <Material/CubeMapMaterial.h>
+#include <Material/RimMaterial.h>
+#include <Material/RimNormalMappingMaterial.h>
 
 #include <Utility/ModelLoader.h>
 
@@ -32,49 +37,18 @@ namespace STL
 
 	DemoLevel::~DemoLevel()
 	{
+		for (auto material : materials)
+		{
+			if (material != nullptr)
+			{
+				delete material;
+				material = nullptr;
+			}
+		}
 	}
 
 	void DemoLevel::Initialize(ID3D11Device* device, Application* engine)
 	{
-		VertexPositionColorUVNormal vertices[] =
-		{
-			VertexPositionColorUVNormal({ -0.5f, -0.5f, 0.5f}, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f }, {0.0f, 0.0f, - 1.0f}),		// 왼쪽 하단.
-			VertexPositionColorUVNormal({ -0.5f,  0.5f, 0.5f}, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f }, {0.0f, 0.0f, - 1.0f}),		// 왼쪽 상단.
-			VertexPositionColorUVNormal({  0.5f,  0.5f, 0.5f}, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f }, {0.0f, 0.0f, - 1.0f}),		// 오른쪽 상단.
-			VertexPositionColorUVNormal({  0.5f, -0.5f, 0.5f}, { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, {0.0f, 0.0f, - 1.0f}),		// 오른쪽 하단.
-		};
-		
-		uint32 indices[] = { 0, 1, 3, 1, 2, 3 };
-		
-		// 머티리얼 생성.
-		TransformMaterial* transformMaterial = new TransformMaterial();
-		transformMaterial->AddTexture(new Texture(L"sample.jpg"));
-		transformMaterial->AddTexture(new Texture(L"directx.png"));
-		transformMaterial->AddTexture(new Texture(L"circle.jpg"));
-		materials.emplace_back(transformMaterial);
-		
-		// Actor1 구성.
-		Actor* actor = new Actor(device);
-		actor->SetPosition(-0.5f, 0.0f, 0.0f);
-		actor->SetScale(0.5f, 0.5f, 1.0f);
-		
-		auto meshComponent = new StaticMeshComponent();
-		meshComponent->Create(device, vertices, _countof(vertices), sizeof(vertices[0]),
-			indices, _countof(indices), sizeof(uint32));
-		meshComponent->AddMaterial(transformMaterial);
-		actor->AddComponent(meshComponent);
-		
-		// Actor2 구성.
-		Actor* actor2 = new Actor(device);
-		actor2->SetPosition(0.5f, 0.0f, 0.0f);
-		actor2->SetScale(0.5f, 0.5f, 1.0f);
-		
-		auto meshComponent2 = new StaticMeshComponent();
-		meshComponent2->Create(device, vertices, _countof(vertices), sizeof(vertices[0]),
-			indices, _countof(indices), sizeof(uint32));
-		meshComponent2->AddMaterial(transformMaterial);
-		actor2->AddComponent(meshComponent2);
-
 		// 카메라 추가.
 		Actor* cameraActor = new Actor(device);
 		cameraActor->SetPosition(0.0f, 100.0f, -200.0f);
@@ -83,7 +57,7 @@ namespace STL
 			static_cast<uint32>(engine->Width()),	// 가로 크기.
 			static_cast<uint32>(engine->Height()),	// 세로 크기.
 			0.1f,									// 근평면 거리.
-			1000.0f									// 원평면 거리.
+			100000.0f									// 원평면 거리.
 		));
 
 		// 카메라 컨트롤러 생성 및 컴포넌트 추가.
@@ -99,32 +73,23 @@ namespace STL
 		ModelLoader::LoadModel(device, "Soldier.fbx", soldierMesh);
 
 		// 머티리얼 생성.
-		auto soldierBodyMaterial = new DiffuseMaterial();
+		auto soldierBodyMaterial = new DiffuseSpecularMaterial();
 		soldierBodyMaterial->AddTexture(new Texture(L"Soldier_Body_diffuse.png"));
+		soldierBodyMaterial->AddTexture(new Texture(L"Soldier_Body_specular.png"));
 		soldierBodyMaterial->Initialize(device);
 		materials.emplace_back(soldierBodyMaterial);
 
-		auto soldierHeadMaterial = new DiffuseMaterial();
+		auto soldierHeadMaterial = new DiffuseSpecularMaterial();
 		soldierHeadMaterial->AddTexture(new Texture(L"Soldier_head_diffuse.png"));
+		soldierHeadMaterial->AddTexture(new Texture(L"Soldier_head_specular.png"));
 		soldierHeadMaterial->Initialize(device);
 		materials.emplace_back(soldierHeadMaterial);
-
-		//// 액터 생성 및 초기화.
-		//Actor* soldierActor = new Actor(device);
-		//// 액터에 스태틱 메시 컴포넌트 추가.
-		//soldierActor->AddComponent(new StaticMeshComponent());
-		//// 추가한 메시 컴포넌트 검색.
-		//auto soldierMeshComponent = soldierActor->GetComponent<StaticMeshComponent>();
-		//// 스태틱 메시 컴포넌트에 스태틱 메시 설정.
-		//soldierMeshComponent->SetStaticMesh(soldierMesh);
-		//// 필요한 머티리얼 추가.
-		//soldierMeshComponent->AddMaterial(soldierBodyMaterial);
-		//soldierMeshComponent->AddMaterial(soldierHeadMaterial);
-		//soldierMeshComponent->AddMaterial(soldierBodyMaterial);
 
 		SoldierActor* soldierActor = new SoldierActor(device);
 		soldierActor->SetStaticMesh(soldierMesh);
 		soldierActor->SetMaterial(soldierBodyMaterial, soldierHeadMaterial);
+		soldierActor->SetPosition(0.0f, 0.0f, 0.0f);
+		soldierActor->SetScale(0.25f, 0.25f, 0.25f);
 
 		// 오징어 게임 액터 추가.
 		// 스태틱 메시 로드.
@@ -132,33 +97,144 @@ namespace STL
 		ModelLoader::LoadModel(device, "PinkSoldier_v01.fbx", squidGameMesh);
 
 		// 머티리얼 생성.
-		auto squidGameMat1 = new DiffuseMaterial();
+		auto squidGameMat1 = new DiffuseSpecularMaterial();
 		squidGameMat1->AddTexture(new Texture(L"PinkSoldier_BaseColor_1001.png"));
+		squidGameMat1->AddTexture(new Texture(L"PinkSoldier_BaseColor_1001.png"));
+		squidGameMat1->SetShiness(100.0f);
+		squidGameMat1->Initialize(device);
 		materials.emplace_back(squidGameMat1);
-		
-		auto squidGameMat2 = new DiffuseMaterial();
+
+		auto squidGameMat2 = new DiffuseSpecularMaterial();
 		squidGameMat2->AddTexture(new Texture(L"PinkSoldier_BaseColor_1002.png"));
+		squidGameMat2->AddTexture(new Texture(L"PinkSoldier_BaseColor_1002.png"));
+		squidGameMat2->SetShiness(100.0f);
+		squidGameMat2->Initialize(device);
 		materials.emplace_back(squidGameMat2);
 
 		// 액터 생성 및 설정.
 		SquidGameActor* squidGameActor = new SquidGameActor(device);
-		squidGameActor->SetPosition(125.0f, 0.0f, 0.0f);
+		squidGameActor->SetPosition(-50.0f, 0.0f, 50.0f);
+		squidGameActor->SetRotation(0.0f, -45.0f, 0.0f);
 		squidGameActor->SetStaticMesh(squidGameMesh);
 		squidGameActor->SetMaterials(squidGameMat1, squidGameMat2);
 
-		// 라이트 액터 생성
+		StaticMesh* squidGameMesh2 = new StaticMesh();
+		ModelLoader::LoadModel(device, "PinkSoldier_v01.fbx", squidGameMesh2);
+
+		// 머티리얼 생성.
+		auto squidGameMat3 = new NormalMappingMaterial();
+		squidGameMat3->AddTexture(new Texture(L"PinkSoldier_BaseColor_1011.png"));
+		squidGameMat3->AddTexture(new Texture(L"PinkSoldier_BaseColor_1011.png"));
+		squidGameMat3->AddTexture(new Texture(L"PinkSoldier_Normal_1011.png"));
+		squidGameMat3->SetShiness(100.0f);
+		squidGameMat3->Initialize(device);
+		materials.emplace_back(squidGameMat3);
+
+		auto squidGameMat4 = new NormalMappingMaterial();
+		squidGameMat4->AddTexture(new Texture(L"PinkSoldier_BaseColor_1002.png"));
+		squidGameMat4->AddTexture(new Texture(L"PinkSoldier_BaseColor_1002.png"));
+		squidGameMat4->AddTexture(new Texture(L"PinkSoldier_Normal_1002.png"));
+		squidGameMat4->SetShiness(100.0f);
+		squidGameMat4->Initialize(device);
+		materials.emplace_back(squidGameMat4);
+
+		// 액터 생성 및 설정.
+		SquidGameActor* squidGameActor2 = new SquidGameActor(device);
+		squidGameActor2->SetPosition(50.0f, 0.0f, -50.0f);
+		squidGameActor2->SetRotation(0.0f, 135.0f, 0.0f);
+		squidGameActor2->SetStaticMesh(squidGameMesh2);
+		squidGameActor2->SetMaterials(squidGameMat3, squidGameMat4);
+
+		auto squidGameMesh3 = new StaticMesh();
+		ModelLoader::LoadModel(device, "PinkSoldier_v01.fbx", squidGameMesh3);
+
+		auto squidGameMat5 = new RimMaterial();
+		squidGameMat5->AddTexture(new Texture(L"PinkSoldier_BaseColor_1001.png"));
+		squidGameMat5->Initialize(device);
+		materials.emplace_back(squidGameMat5);
+
+		auto squidGameMat6 = new RimMaterial();
+		squidGameMat6->AddTexture(new Texture(L"PinkSoldier_BaseColor_1002.png"));
+		squidGameMat6->Initialize(device);
+		materials.emplace_back(squidGameMat6);
+
+		SquidGameActor* squidGameActor3 = new SquidGameActor(device);
+		squidGameActor3->SetPosition(-50.0f, 0.0f, -50.0f);
+		squidGameActor3->SetRotation(0.0f, -135.0f, 0.0f);
+		squidGameActor3->SetStaticMesh(squidGameMesh3);
+		squidGameActor3->SetMaterials(squidGameMat5, squidGameMat6);
+
+		// 액터 생성 및 설정.
+		auto squidGameMesh4 = new StaticMesh();
+		ModelLoader::LoadModel(device, "PinkSoldier_v01.fbx", squidGameMesh4);
+
+		auto squidGameMat7 = new RimNormalMappingMaterial();
+		squidGameMat7->AddTexture(new Texture(L"PinkSoldier_BaseColor_1021.png"));
+		squidGameMat7->AddTexture(new Texture(L"PinkSoldier_BaseColor_1021.png"));
+		squidGameMat7->AddTexture(new Texture(L"PinkSoldier_Normal_1021.png"));
+		squidGameMat7->SetRimLightColor({ 1.0f, 0.0f, 1.0f });
+		squidGameMat7->Initialize(device);
+		materials.emplace_back(squidGameMat7);
+
+		auto squidGameMat8 = new RimNormalMappingMaterial();
+		squidGameMat8->AddTexture(new Texture(L"PinkSoldier_BaseColor_1002.png"));
+		squidGameMat8->AddTexture(new Texture(L"PinkSoldier_BaseColor_1002.png"));
+		squidGameMat8->AddTexture(new Texture(L"PinkSoldier_Normal_1002.png"));
+		squidGameMat8->SetRimLightColor({ 1.0f, 0.0f, 1.0f });
+		squidGameMat8->Initialize(device);
+		materials.emplace_back(squidGameMat8);
+
+		SquidGameActor* squidGameActor4 = new SquidGameActor(device);
+		squidGameActor4->SetPosition(50.0f, 0.0f, 50.0f);
+		squidGameActor4->SetRotation(0.0f, 45.0f, 0.0f);
+		squidGameActor4->SetStaticMesh(squidGameMesh4);
+		squidGameActor4->SetMaterials(squidGameMat7, squidGameMat8);
+
+		// 스카이 박스.
+		StaticMesh* sphereMesh = new StaticMesh();
+		ModelLoader::LoadModel(device, "Sphere.FBX", sphereMesh);
+
+		auto cubemapMaterial = new CubeMapMaterial();
+		cubemapMaterial->AddTexture(new Texture(TEXT("Bridge2.dds")));
+		cubemapMaterial->Initialize(device);
+		materials.emplace_back(cubemapMaterial);
+
+		Actor* cubemapActor = new Actor(device, TEXT("Skybox"));
+		cubemapActor->SetScale(100.0f, 100.0f, 100.0f);
+		auto cubemapMeshComponent = new StaticMeshComponent();
+		cubemapMeshComponent->SetStaticMesh(sphereMesh);
+		cubemapMeshComponent->AddMaterial(cubemapMaterial);
+		cubemapActor->AddComponent(cubemapMeshComponent);
+
+		// 라이트 액터 생성.
 		Actor* lightActor = new Actor(device);
 		lightActor->SetPosition(500.0f, 500.0f, -500.0f);
 		lightActor->AddComponent(new LightComponent());
+		auto lightComponent = lightActor->GetComponent<LightComponent>();
+		lightComponent->SetLightColor({ 1.0f, 1.0f, 1.0f });
 
-		// 레벨에 액터 추가.
-		AddActor(actor);
-		AddActor(actor2);
+		 //레벨에 액터 추가.
+		//AddActor(actor);
+		//AddActor(actor2);
 		AddActor(cameraActor);
 		AddActor(soldierActor);
 		AddActor(squidGameActor);
+		AddActor(squidGameActor2);
+		AddActor(squidGameActor3);
+		AddActor(squidGameActor4);
+		AddActor(cubemapActor);
 		AddActor(lightActor);
 
 		Level::Initialize(device, engine);
+	}
+	
+	void DemoLevel::Update(ID3D11DeviceContext* context, float deltaTime)
+	{
+		Level::Update(context, deltaTime);
+	}
+	
+	void DemoLevel::Draw(ID3D11DeviceContext* context)
+	{
+		Level::Draw(context);
 	}
 }
